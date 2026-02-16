@@ -11,6 +11,7 @@ NestJS API for QR Bell auth, homes, ring events, and push notifications.
 - `pnpm lint`
 - `pnpm typecheck`
 - `pnpm test`
+- `pnpm test:e2e`
 
 ## Deploy
 - Platform: Railway or Render
@@ -27,3 +28,9 @@ Supported load order:
 Templates committed:
 - `.env.example`
 - `.env.develop.example`
+
+Rate-limit env vars:
+- `GLOBAL_RATE_LIMIT_MAX`
+- `GLOBAL_RATE_LIMIT_WINDOW_MS`
+- `RING_RATE_LIMIT_MAX`
+- `RING_RATE_LIMIT_WINDOW_MS`

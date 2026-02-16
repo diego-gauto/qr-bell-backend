@@ -4,6 +4,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { AuthenticatedUser } from '../../auth/interfaces/authenticated-user.interface';
 import { RingDto } from '../dto/ring.dto';
 import { UpdateCallStatusDto } from '../dto/update-call-status.dto';
+import { RingRateLimitGuard } from '../guards/ring-rate-limit.guard';
 import { CallResponse } from '../interfaces/call-response.interface';
 import { CallsService } from '../services/calls.service';
 
@@ -11,6 +12,7 @@ import { CallsService } from '../services/calls.service';
 export class CallsController {
   constructor(private readonly callsService: CallsService) {}
 
+  @UseGuards(RingRateLimitGuard)
   @Post('ring')
   ring(@Body() dto: RingDto): Promise<CallResponse> {
     return this.callsService.ring(dto);

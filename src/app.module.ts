@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { GlobalRateLimitGuard } from './common/guards/global-rate-limit.guard';
+import { RateLimitStoreService } from './common/guards/rate-limit-store.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { CallsModule } from './modules/calls/calls.module';
 import { HomesModule } from './modules/homes/homes.module';
@@ -42,6 +45,13 @@ const envFilePaths = [
     CallsModule,
     PushModule,
     WebsocketModule
+  ],
+  providers: [
+    RateLimitStoreService,
+    {
+      provide: APP_GUARD,
+      useClass: GlobalRateLimitGuard
+    }
   ]
 })
 export class AppModule {}
