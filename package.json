@@ -4,13 +4,17 @@
   "private": true,
   "packageManager": "pnpm@10",
   "scripts": {
+    "dev": "NODE_ENV=develop nest start --watch",
     "start": "node dist/main",
-    "start:dev": "nest start --watch",
+    "start:dev": "NODE_ENV=develop nest start --watch",
     "build": "nest build",
     "lint": "eslint \"src/**/*.ts\"",
     "typecheck": "tsc --noEmit",
     "test": "jest",
-    "test:e2e": "jest --config test/jest-e2e.json"
+    "test:e2e": "jest --config test/jest-e2e.json",
+    "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js -d src/database/data-source.ts",
+    "migration:run": "NODE_ENV=develop pnpm typeorm migration:run",
+    "migration:revert": "NODE_ENV=develop pnpm typeorm migration:revert"
   },
   "dependencies": {
     "@nestjs/common": "latest",

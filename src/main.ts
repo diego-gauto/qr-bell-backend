@@ -15,11 +15,11 @@ async function bootstrap(): Promise<void> {
   );
 
   app.enableCors({
-    origin: process.env.CORS_ORIGIN,
+    origin: process.env['CORS_ORIGIN'],
     credentials: true
   });
 
-  const port = process.env.PORT ? Number(process.env.PORT) : 4000;
+  const port = process.env['PORT'] ? Number(process.env['PORT']) : 4000;
   await app.listen(port);
 }
 

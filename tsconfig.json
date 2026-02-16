@@ -28,6 +28,7 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "types": ["node", "jest"]
   }
 }
