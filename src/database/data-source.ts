@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { DataSource } from 'typeorm';
 import { UserEntity } from '../modules/auth/entities/user.entity';
+import { HomeEntity } from '../modules/homes/entities/home.entity';
 
 function loadEnvFile(filePath: string): void {
   if (!existsSync(filePath)) {
@@ -49,7 +50,7 @@ const appDataSource = new DataSource({
   type: 'postgres',
   url: databaseUrl,
   ssl: useSsl ? { rejectUnauthorized: false } : false,
-  entities: [UserEntity],
+  entities: [UserEntity, HomeEntity],
   migrations: ['src/database/migrations/*.ts']
 });
 
