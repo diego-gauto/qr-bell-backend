@@ -1,9 +1,11 @@
-import { IsObject, IsString } from 'class-validator';
+import { IsObject, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class SubscribePushDto {
   @IsObject()
   subscription!: Record<string, unknown>;
 
+  @IsOptional()
   @IsString()
-  userAgent!: string;
+  @MaxLength(512)
+  userAgent?: string;
 }
