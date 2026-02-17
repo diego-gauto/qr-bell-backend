@@ -61,6 +61,12 @@ describe('CallsService', () => {
                 return 'https://app.example.com';
               }
               return undefined;
+            },
+            getOrThrow: (key: string): string => {
+              if (key === 'JWT_SECRET') {
+                return 'test-jwt-secret';
+              }
+              throw new Error(`Missing config: ${key}`);
             }
           }
         }
@@ -97,6 +103,7 @@ describe('CallsService', () => {
     });
 
     expect(ringResult.status).toBe('ringing');
+    expect(ringResult.visitorToken).toBeDefined();
     expect(pushService.notifyRing).toHaveBeenCalledWith(
       home.ownerId,
       expect.objectContaining({

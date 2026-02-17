@@ -7,6 +7,7 @@ import { UpdateCallStatusDto } from '../dto/update-call-status.dto';
 import { RingRateLimitGuard } from '../guards/ring-rate-limit.guard';
 import { CallHistoryItemResponse } from '../interfaces/call-history-item.interface';
 import { CallResponse } from '../interfaces/call-response.interface';
+import { RingResponse } from '../interfaces/ring-response.interface';
 import { CallsService } from '../services/calls.service';
 
 @Controller()
@@ -15,7 +16,7 @@ export class CallsController {
 
   @UseGuards(RingRateLimitGuard)
   @Post('ring')
-  ring(@Body() dto: RingDto): Promise<CallResponse> {
+  ring(@Body() dto: RingDto): Promise<RingResponse> {
     return this.callsService.ring(dto);
   }
 

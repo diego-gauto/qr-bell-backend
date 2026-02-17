@@ -8,6 +8,8 @@ import { RingDto } from '../dto/ring.dto';
 import { CallEntity, CallStatus } from '../entities/call.entity';
 import { CallHistoryItemResponse } from '../interfaces/call-history-item.interface';
 import { CallResponse } from '../interfaces/call-response.interface';
+import { RingResponse } from '../interfaces/ring-response.interface';
+import { signVisitorToken } from '../utils/visitor-token';
 
 interface UpdateCallStatusInput {
   callId: string;
@@ -19,6 +21,7 @@ interface UpdateCallStatusInput {
 export class CallsService {
   private readonly frontendAppUrl: string;
   private readonly ringingAutoMissMs: number;
+  private readonly visitorTokenSecret: string;
 
   constructor(
     @InjectRepository(CallEntity)
@@ -37,6 +40,11 @@ export class CallsService {
     const seconds = raw ? Number(raw) : 120;
     const safeSeconds = Number.isFinite(seconds) && seconds > 0 ? seconds : 120;
     this.ringingAutoMissMs = Math.floor(safeSeconds * 1000);
+
+    // Stateless visitor auth for WebRTC signaling. Defaults to JWT_SECRET to avoid extra env wiring.
+    this.visitorTokenSecret =
+      this.configService.get<string>('VISITOR_TOKEN_SECRET') ??
+      this.configService.getOrThrow<string>('JWT_SECRET');
   }
 
   private async expireRingingCalls(homeIds: string[]): Promise<void> {
@@ -60,7 +68,7 @@ export class CallsService {
     );
   }
 
-  async ring(dto: RingDto): Promise<CallResponse> {
+  async ring(dto: RingDto): Promise<RingResponse> {
     const home = await this.homesRepository.findOne({
       where: {
         id: dto.homeId,
@@ -89,7 +97,10 @@ export class CallsService {
       ringUrl: `${this.frontendAppUrl}/call/${encodeURIComponent(savedCall.id)}`
     });
 
-    return this.toResponse(savedCall);
+    return {
+      ...this.toResponse(savedCall),
+      visitorToken: signVisitorToken(savedCall.id, this.visitorTokenSecret)
+    };
   }
 
   async updateStatus(input: UpdateCallStatusInput): Promise<CallResponse> {
