@@ -6,6 +6,7 @@ import { GlobalRateLimitGuard } from './common/guards/global-rate-limit.guard';
 import { RateLimitStoreService } from './common/guards/rate-limit-store.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { CallsModule } from './modules/calls/calls.module';
+import { HealthModule } from './modules/health/health.module';
 import { HomesModule } from './modules/homes/homes.module';
 import { PushModule } from './modules/push/push.module';
 import { UsersModule } from './modules/users/users.module';
@@ -41,6 +42,7 @@ const envFilePaths = [
     }),
     AuthModule,
     UsersModule,
+    HealthModule,
     HomesModule,
     CallsModule,
     PushModule,
