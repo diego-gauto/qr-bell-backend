@@ -5,7 +5,7 @@
   "packageManager": "pnpm@10.17.1",
   "scripts": {
     "dev": "NODE_ENV=develop nest start --watch",
-    "start": "node dist/main",
+    "start": "node dist/src/main.js",
     "start:dev": "NODE_ENV=develop nest start --watch",
     "build": "nest build",
     "lint": "eslint \"src/**/*.ts\"",
