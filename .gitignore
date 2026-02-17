@@ -5,7 +5,6 @@ coverage
 .env.*
 !.env.example
 !.env.*.example
-pnpm-lock.yaml
 .DS_Store
 
 *.tsbuildinfo
