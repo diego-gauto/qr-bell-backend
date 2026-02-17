@@ -2,7 +2,7 @@
   "name": "qr-bell-backend",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@10",
+  "packageManager": "pnpm@10.17.1",
   "scripts": {
     "dev": "NODE_ENV=develop nest start --watch",
     "start": "node dist/main",
