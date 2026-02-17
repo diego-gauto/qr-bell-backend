@@ -12,6 +12,7 @@ type MockRepository = {
   save: jest.Mock;
   findOne: jest.Mock;
   find: jest.Mock;
+  update: jest.Mock;
 };
 
 function createRepositoryMock(): MockRepository {
@@ -19,7 +20,8 @@ function createRepositoryMock(): MockRepository {
     create: jest.fn(),
     save: jest.fn(),
     findOne: jest.fn(),
-    find: jest.fn()
+    find: jest.fn(),
+    update: jest.fn().mockResolvedValue({ affected: 0 })
   };
 }
 
@@ -224,6 +226,7 @@ describe('CallsService', () => {
     const result = await service.listByOwner(ownerId, 50);
 
     expect(homesRepository.find).toHaveBeenCalledWith({ where: { ownerId } });
+    expect(callsRepository.update).toHaveBeenCalled();
     expect(callsRepository.find).toHaveBeenCalledWith(
       expect.objectContaining({
         order: { createdAt: 'DESC' },

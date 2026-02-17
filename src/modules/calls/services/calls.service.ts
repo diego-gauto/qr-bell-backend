@@ -1,7 +1,7 @@
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, LessThan, Repository } from 'typeorm';
 import { HomeEntity } from '../../homes/entities/home.entity';
 import { PushService } from '../../push/services/push.service';
 import { RingDto } from '../dto/ring.dto';
@@ -18,6 +18,7 @@ interface UpdateCallStatusInput {
 @Injectable()
 export class CallsService {
   private readonly frontendAppUrl: string;
+  private readonly ringingAutoMissMs: number;
 
   constructor(
     @InjectRepository(CallEntity)
@@ -30,6 +31,33 @@ export class CallsService {
     const configured = this.configService.get<string>('FRONTEND_APP_URL');
     const corsOrigin = this.configService.get<string>('CORS_ORIGIN');
     this.frontendAppUrl = (configured ?? corsOrigin ?? 'http://localhost:3000').replace(/\/+$/, '');
+
+    // Render Free may sleep, so we expire on-demand (when listing history) rather than relying on a scheduler.
+    const raw = this.configService.get<string>('CALL_RINGING_AUTO_MISS_SECONDS');
+    const seconds = raw ? Number(raw) : 120;
+    const safeSeconds = Number.isFinite(seconds) && seconds > 0 ? seconds : 120;
+    this.ringingAutoMissMs = Math.floor(safeSeconds * 1000);
+  }
+
+  private async expireRingingCalls(homeIds: string[]): Promise<void> {
+    if (homeIds.length === 0) {
+      return;
+    }
+
+    const threshold = new Date(Date.now() - this.ringingAutoMissMs);
+
+    await this.callsRepository.update(
+      {
+        homeId: In(homeIds),
+        status: 'ringing',
+        createdAt: LessThan(threshold)
+      },
+      {
+        status: 'missed',
+        missedAt: new Date(),
+        answeredAt: null
+      }
+    );
   }
 
   async ring(dto: RingDto): Promise<CallResponse> {
@@ -120,6 +148,9 @@ export class CallsService {
 
     const homeIds = homes.map((home) => home.id);
     const homeNameById = new Map(homes.map((home) => [home.id, home.name]));
+
+    // Avoid calls being stuck in `ringing` forever.
+    await this.expireRingingCalls(homeIds);
 
     const calls = await this.callsRepository.find({
       where: { homeId: In(homeIds) },
