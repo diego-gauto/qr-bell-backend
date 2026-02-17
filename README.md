@@ -14,8 +14,31 @@ NestJS API for QR Bell auth, homes, ring events, and push notifications.
 - `pnpm test:e2e`
 
 ## Deploy
-- Platform: Railway or Render
+### Platform
+- Backend: Railway (recommended) or Render
 - Database: Neon PostgreSQL
+
+### Build/Start
+- Build: `pnpm install --frozen-lockfile && pnpm build`
+- Start: `pnpm start` (listens on `PORT`)
+
+### Migrations
+Run on deploy (Railway "Deploy Command" or Render "Pre-Deploy Command"):
+- `pnpm migration:run`
+
+### Production Env Vars (required)
+- `DATABASE_URL` (Neon pooled URL, with `sslmode=require`)
+- `DATABASE_SSL` (`true`)
+- `PORT` (set by platform)
+- `CORS_ORIGIN` (your Vercel frontend origin, e.g. `https://<app>.vercel.app`)
+- `FRONTEND_APP_URL` (same as `CORS_ORIGIN`)
+- `JWT_SECRET`
+- `JWT_EXPIRES_IN` (default `15m`)
+- `REFRESH_TOKEN_SECRET`
+- `REFRESH_TOKEN_EXPIRES_IN` (default `7d`)
+- `VAPID_PUBLIC_KEY`
+- `VAPID_PRIVATE_KEY`
+- `VAPID_SUBJECT` (format: `mailto:you@example.com`)
 
 ## Environment
 Use `.env.develop` for local development.
