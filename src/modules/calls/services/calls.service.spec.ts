@@ -11,13 +11,15 @@ type MockRepository = {
   create: jest.Mock;
   save: jest.Mock;
   findOne: jest.Mock;
+  find: jest.Mock;
 };
 
 function createRepositoryMock(): MockRepository {
   return {
     create: jest.fn(),
     save: jest.fn(),
-    findOne: jest.fn()
+    findOne: jest.fn(),
+    find: jest.fn()
   };
 }
 
@@ -188,5 +190,48 @@ describe('CallsService', () => {
         homeId: '6f76cb04-ea20-43fa-8f4e-395527fb4efe'
       })
     ).rejects.toThrow(NotFoundException);
+  });
+
+  it('lists calls for owner homes', async () => {
+    const ownerId = 'f0d2b8be-4f63-4be1-95ca-d83ddf9f1f21';
+    const homeA = {
+      id: '6f76cb04-ea20-43fa-8f4e-395527fb4efe',
+      ownerId,
+      name: 'Casa A',
+      isActive: true
+    } as HomeEntity;
+    const homeB = {
+      id: '0c6d3345-6a23-4c13-b0f0-ced9b0dc9d7b',
+      ownerId,
+      name: 'Casa B',
+      isActive: true
+    } as HomeEntity;
+
+    const now = new Date('2026-02-16T21:10:00.000Z');
+    const call = {
+      id: 'd15d4109-b66c-4684-9583-97e3462e6657',
+      homeId: homeB.id,
+      status: 'accepted' as CallStatus,
+      createdAt: now,
+      updatedAt: now,
+      answeredAt: now,
+      missedAt: null
+    } as CallEntity;
+
+    homesRepository.find.mockResolvedValue([homeA, homeB]);
+    callsRepository.find.mockResolvedValue([call]);
+
+    const result = await service.listByOwner(ownerId, 50);
+
+    expect(homesRepository.find).toHaveBeenCalledWith({ where: { ownerId } });
+    expect(callsRepository.find).toHaveBeenCalledWith(
+      expect.objectContaining({
+        order: { createdAt: 'DESC' },
+        take: 50
+      })
+    );
+    expect(result).toHaveLength(1);
+    expect(result[0]?.homeName).toBe('Casa B');
+    expect(result[0]?.status).toBe('accepted');
   });
 });

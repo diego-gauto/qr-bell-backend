@@ -1,11 +1,12 @@
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { HomeEntity } from '../../homes/entities/home.entity';
 import { PushService } from '../../push/services/push.service';
 import { RingDto } from '../dto/ring.dto';
 import { CallEntity, CallStatus } from '../entities/call.entity';
+import { CallHistoryItemResponse } from '../interfaces/call-history-item.interface';
 import { CallResponse } from '../interfaces/call-response.interface';
 
 interface UpdateCallStatusInput {
@@ -104,6 +105,38 @@ export class CallsService {
 
     const saved = await this.callsRepository.save(call);
     return this.toResponse(saved);
+  }
+
+  async listByOwner(ownerId: string, limit = 50): Promise<CallHistoryItemResponse[]> {
+    const safeLimit = Number.isFinite(limit) ? Math.min(Math.max(Math.floor(limit), 1), 200) : 50;
+
+    const homes = await this.homesRepository.find({
+      where: { ownerId }
+    });
+
+    if (homes.length === 0) {
+      return [];
+    }
+
+    const homeIds = homes.map((home) => home.id);
+    const homeNameById = new Map(homes.map((home) => [home.id, home.name]));
+
+    const calls = await this.callsRepository.find({
+      where: { homeId: In(homeIds) },
+      order: { createdAt: 'DESC' },
+      take: safeLimit
+    });
+
+    return calls.map((call) => ({
+      id: call.id,
+      homeId: call.homeId,
+      homeName: homeNameById.get(call.homeId) ?? 'Home',
+      status: call.status,
+      createdAt: call.createdAt.toISOString(),
+      updatedAt: call.updatedAt.toISOString(),
+      answeredAt: call.answeredAt ? call.answeredAt.toISOString() : null,
+      missedAt: call.missedAt ? call.missedAt.toISOString() : null
+    }));
   }
 
   private toResponse(call: CallEntity): CallResponse {
