@@ -56,7 +56,8 @@ export class CallsService {
       callId: savedCall.id,
       homeId: home.id,
       homeName: home.name,
-      ringUrl: `${this.frontendAppUrl}/ring?h=${encodeURIComponent(home.id)}`
+      // Owner deep-link: the visitor page is `/ring`, but notifications should open the owner call screen.
+      ringUrl: `${this.frontendAppUrl}/call/${encodeURIComponent(savedCall.id)}`
     });
 
     return this.toResponse(savedCall);
