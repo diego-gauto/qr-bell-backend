@@ -13,8 +13,8 @@
     "test": "jest",
     "test:e2e": "jest --config test/jest-e2e.json",
     "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js -d src/database/data-source.ts",
-    "migration:run": "NODE_ENV=develop pnpm typeorm migration:run",
-    "migration:revert": "NODE_ENV=develop pnpm typeorm migration:revert"
+    "migration:run": "pnpm typeorm migration:run",
+    "migration:revert": "pnpm typeorm migration:revert"
   },
   "dependencies": {
     "@nestjs/common": "latest",
@@ -38,7 +38,9 @@
     "rxjs": "latest",
     "socket.io": "latest",
     "typeorm": "latest",
-    "web-push": "latest"
+    "web-push": "latest",
+    "ts-node": "latest",
+    "typescript": "latest"
   },
   "devDependencies": {
     "@nestjs/cli": "latest",
@@ -53,8 +55,6 @@
     "eslint": "latest",
     "jest": "latest",
     "prettier": "latest",
-    "ts-jest": "latest",
-    "ts-node": "latest",
-    "typescript": "latest"
+    "ts-jest": "latest"
   }
 }
