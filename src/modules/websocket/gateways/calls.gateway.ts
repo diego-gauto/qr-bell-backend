@@ -191,6 +191,16 @@ export class CallsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.to(room).emit('call:peer_joined', { role });
       client.emit('call:joined', { role, callId });
 
+      // Critical reliability: if the owner already accepted (or ended) before this client connected,
+      // replay the state so we don't miss the event (common on mobile networks).
+      if (role === 'visitor') {
+        if (call.status === 'accepted') {
+          client.emit('call:accepted', { callId });
+        } else if (call.status === 'missed') {
+          client.emit('call:ended', { callId, reason: 'missed' });
+        }
+      }
+
       this.logger.log(`Socket connected role=${role} callId=${callId}`);
     } catch (error) {
       this.logger.warn(`Socket connection failed: ${(error as Error).message}`);
@@ -259,4 +269,3 @@ export class CallsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return `call:${callId}`;
   }
 }
-
