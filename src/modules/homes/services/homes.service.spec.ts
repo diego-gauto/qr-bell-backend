@@ -69,7 +69,7 @@ describe('HomesService', () => {
       address: ' Av. Siempre Viva 123 '
     });
 
-    expect(created.ringUrl).toBe('https://app.example.com/ring?h=8d4bb768-0f47-4da8-816c-6b287f0d6208');
+    expect(created.ringUrl).toBe('https://app.example.com/?h=8d4bb768-0f47-4da8-816c-6b287f0d6208');
     expect(repository.save).toHaveBeenCalledTimes(1);
   });
 

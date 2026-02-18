@@ -74,7 +74,8 @@ export class HomesService {
   }
 
   private buildRingUrl(homeId: string): string {
-    return `${this.frontendAppUrl}/ring?h=${encodeURIComponent(homeId)}`;
+    // Visitor entrypoint is `/` so scanning a QR always lands on the "Tocar timbre" screen.
+    return `${this.frontendAppUrl}/?h=${encodeURIComponent(homeId)}`;
   }
 
   private resolveFrontendAppUrl(): string {
